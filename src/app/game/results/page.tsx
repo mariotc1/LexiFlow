@@ -7,15 +7,15 @@ import { Button } from "@/components/ui/Button";
 import { dbService } from "@/lib/db";
 import { Trophy, RefreshCw, Home } from "lucide-react";
 import { motion } from "framer-motion";
+import { sfx } from "@/lib/sound";
 
 export default function ResultsPage() {
   const { score, results, words, resetGame } = useGameStore();
   const router = useRouter();
 
   useEffect(() => {
-    // Save stats?
-    // In a real app we'd save the session to IDB here or in store
-    // For now we just display
+    sfx.playWin();
+    // Save stats logic...
   }, []); // eslint-disable-line
 
   const accuracy = Math.round((results.correct / words.length) * 100) || 0;

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Volume2 } from "lucide-react";
+import { sfx } from "@/lib/sound";
 
 export default function PlayPage() {
   const { words, currentWordIndex, gameMode, isPlaying, submitAnswer, resetGame } = useGameStore();
@@ -66,13 +67,14 @@ export default function PlayPage() {
     const check = checkAnswer(input, target, currentWord.respuestasAlternativas);
     setFeedback({ result: check.result, correct: target, distance: check.distance });
     
-    // Play sound?
+    
+    // Play sound
     if (check.result === 'correct') {
-      // playSuccessSound();
-      const end = Date.now() + 500;
-        // confetti logic if installed
+      sfx.playCorrect();
+    } else if (check.result === 'almost') {
+      sfx.playAlmost();
     } else {
-      // playErrorSound();
+      sfx.playIncorrect();
     }
   };
 

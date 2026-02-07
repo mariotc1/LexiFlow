@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { dbService } from '../lib/db';
 import { Tema, Palabra, Partida, ModoJuego } from '../types';
 
@@ -76,13 +77,24 @@ export const useGameStore = create<GameState>((set) => ({
   resetGame: () => set({ isPlaying: false, words: [], currentWordIndex: 0 })
 }));
 
-// --- Settings Store (Theme, Sound, etc) ---
+// --- Settings Store (Theme, Sound, User) ---
 interface SettingsStore {
+  userName: string;
   soundEnabled: boolean;
+  setUserName: (name: string) => void;
   toggleSound: () => void;
 }
 
-export const useSettingsStore = create<SettingsStore>((set) => ({
-  soundEnabled: true,
-  toggleSound: () => set(state => ({ soundEnabled: !state.soundEnabled }))
-}));
+export const useSettingsStore = create<SettingsStore>()(
+  persist(
+    (set) => ({
+      userName: "",
+      soundEnabled: true,
+      setUserName: (name) => set({ userName: name }),
+      toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
+    }),
+    {
+      name: 'lexiflow-settings',
+    }
+  )
+);

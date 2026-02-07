@@ -14,28 +14,35 @@
   --color-surface: var(--surface);
   --color-surface-hover: var(--surface-hover);
 
-  --shadow-neon-blue:
-    0 0 10px rgba(0, 243, 255, 0.5), 0 0 20px rgba(0, 243, 255, 0.3);
-  --shadow-neon-purple:
-    0 0 10px rgba(188, 19, 254, 0.5), 0 0 20px rgba(188, 19, 254, 0.3);
+  --shadow-neon-blue: 0 0 20px rgba(0, 247, 255, 0.6);
+  --shadow-neon-purple: 0 0 20px rgba(188, 19, 254, 0.6);
 }
 
 :root {
-  --background: #050510;
-  --foreground: #ffffff;
-  --surface: rgba(255, 255, 255, 0.05); /* Glass effect base */
-  --surface-hover: rgba(255, 255, 255, 0.1);
+  /* Dynamic Background Image from public folder */
+  --background-image: url('/image.png');
 
-  --brand-primary: #00f3ff; /* Cyan Neon */
-  --brand-secondary: #bc13fe; /* Purple Neon */
-  --brand-accent: #ff0055; /* Pink Neon */
+  --background: #1a1a2e; /* Fallback */
+  --foreground: #ffffff;
+
+  /* More vibrant, friendly colors (Kahoot-ish but premium) */
+  --brand-primary: #00f0ff; /* Bright Cyan */
+  --brand-secondary: #aa22ff; /* Bright Purple */
+  --brand-accent: #ff0099; /* Hot Pink */
+
+  --surface: rgba(255, 255, 255, 0.15); /* Stronger glass */
+  --surface-hover: rgba(255, 255, 255, 0.25);
 
   --font-geist-sans: "Geist Sans", sans-serif;
   --font-geist-mono: "Geist Mono", monospace;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
+  background-image: var(--background-image);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-geist-sans);
   overflow-x: hidden;
@@ -43,19 +50,21 @@ body {
 }
 
 /* Glassmorphism Utilities */
-.glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+/* The original .glass class was removed as it was replaced by the enhanced .glass-panel */
+
+/* Enhanced Glassmorphism for "Friendly" look */
+.glass-panel {
+  background: rgba(23, 23, 35, 0.6); /* Slightly darker for contrast against colorful bg */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  @apply rounded-3xl shadow-xl transition-all duration-300;
 }
 
-.glass-panel {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  @apply rounded-2xl shadow-xl;
+.glass-panel:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
 }
 
 .text-gradient {

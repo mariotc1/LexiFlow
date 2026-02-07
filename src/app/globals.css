@@ -33,8 +33,7 @@
   --surface: rgba(20, 20, 25, 0.7); /* Darker, more solid glass */
   --surface-hover: rgba(40, 40, 45, 0.8);
 
-  --font-geist-sans: "Geist Sans", sans-serif;
-  --font-geist-mono: "Geist Mono", monospace;
+  --font-sans: var(--font-outfit), system-ui, sans-serif;
 }
 
 body {
@@ -47,7 +46,7 @@ body {
   background-position: center;
   background-attachment: fixed;
   color: var(--foreground);
-  font-family: var(--font-geist-sans);
+  font-family: var(--font-sans);
   overflow-x: hidden;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;

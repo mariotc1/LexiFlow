@@ -19,9 +19,9 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-white/5 bg-[var(--background)]/80 backdrop-blur-xl hidden md:flex flex-col">
-      <div className="flex h-20 items-center px-6 border-b border-white/5">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-secondary)] bg-clip-text text-transparent">
+    <aside className="fixed left-4 top-4 bottom-4 z-40 w-64 rounded-3xl border border-white/10 bg-black/40 backdrop-blur-2xl hidden md:flex flex-col shadow-2xl">
+      <div className="flex h-24 items-center px-8 border-b border-white/5">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-secondary)] bg-clip-text text-transparent transform -skew-x-6">
           LexiFlow
         </h1>
       </div>

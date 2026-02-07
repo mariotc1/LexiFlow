@@ -17,7 +17,7 @@ export default function RootLayout({
       <body className="antialiased min-h-screen">
         <div className="flex min-h-screen">
           <Sidebar />
-          <main className="flex-1 md:ml-64 p-6 overflow-y-auto h-screen bg-gradient-to-br from-[var(--background)] to-[#0a0a1a]">
+          <main className="flex-1 md:ml-72 p-6 overflow-y-auto h-screen">
             <div className="mx-auto max-w-6xl">
               {children}
             </div>

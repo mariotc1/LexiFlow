@@ -40,6 +40,7 @@ interface GameState {
   score: number;
   words: Palabra[];
   results: { correct: number; incorrect: number };
+  resultsDetails: { wordId: string; correct: boolean }[];
   gameMode: ModoJuego;
   startGame: (words: Palabra[], mode: ModoJuego) => void;
   submitAnswer: (correct: boolean) => void;
@@ -53,6 +54,7 @@ export const useGameStore = create<GameState>((set) => ({
   score: 0,
   words: [],
   results: { correct: 0, incorrect: 0 },
+  resultsDetails: [],
   gameMode: 'mixto',
 
   startGame: (words, mode) => set({
@@ -61,6 +63,7 @@ export const useGameStore = create<GameState>((set) => ({
     currentWordIndex: 0,
     score: 0,
     results: { correct: 0, incorrect: 0 },
+    resultsDetails: [],
     gameMode: mode
   }),
 
@@ -70,11 +73,12 @@ export const useGameStore = create<GameState>((set) => ({
       correct: state.results.correct + (correct ? 1 : 0),
       incorrect: state.results.incorrect + (correct ? 0 : 1)
     },
+    resultsDetails: [...state.resultsDetails, { wordId: state.words[state.currentWordIndex].id, correct }],
     currentWordIndex: state.currentWordIndex + 1
   })),
 
   endGame: () => set({ isPlaying: false }),
-  resetGame: () => set({ isPlaying: false, words: [], currentWordIndex: 0 })
+  resetGame: () => set({ isPlaying: false, words: [], currentWordIndex: 0, resultsDetails: [] })
 }));
 
 // --- Settings Store (Theme, Sound, User) ---

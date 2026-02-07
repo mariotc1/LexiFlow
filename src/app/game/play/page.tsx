@@ -5,13 +5,12 @@ import { useGameStore } from "@/stores";
 import { useRouter } from "next/navigation";
 import { checkAnswer, CheckResult } from "@/lib/game";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Volume2 } from "lucide-react";
+import { Volume2, ArrowRight, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { sfx } from "@/lib/sound";
 
 export default function PlayPage() {
-  const { words, currentWordIndex, gameMode, isPlaying, submitAnswer, resetGame } = useGameStore();
+  const { words, currentWordIndex, gameMode, isPlaying, submitAnswer } = useGameStore();
   const router = useRouter();
 
   const [input, setInput] = useState("");
@@ -24,58 +23,49 @@ export default function PlayPage() {
     }
   }, [isPlaying, words, router]);
 
-  const currentWord = words[currentWordIndex];
+  // Focus input on mount and next word
+  useEffect(() => {
+    if (!feedback) {
+       inputRef.current?.focus();
+    }
+  }, [currentWordIndex, feedback]);
 
+  const currentWord = words[currentWordIndex];
   if (!currentWord) return null;
 
-  // Determine prompt and target based on mode
+  // Determine prompt and target
   let prompt = "";
   let target = "";
   let targetLang = "";
 
-  if (gameMode === 'es-en') {
+  // Helper to determine mode per word if mixed
+  const isEsEn = gameMode === 'es-en' || (gameMode === 'mixto' && (currentWord.ingles.length + currentWord.espanol.length + currentWordIndex) % 2 === 0);
+
+  if (isEsEn) {
     prompt = currentWord.espanol;
     target = currentWord.ingles;
     targetLang = 'en-US';
-  } else if (gameMode === 'en-es') {
+  } else {
     prompt = currentWord.ingles;
     target = currentWord.espanol;
     targetLang = 'es-ES';
-  } else {
-    // Random mixed
-    // Use word id or index to deterministically random
-    const isEsEn = (currentWord.ingles.length + currentWord.espanol.length + currentWordIndex) % 2 === 0;
-    if (isEsEn) {
-      prompt = currentWord.espanol;
-      target = currentWord.ingles;
-      targetLang = 'en-US';
-    } else {
-      prompt = currentWord.ingles;
-      target = currentWord.espanol;
-      targetLang = 'es-ES';
-    }
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (feedback) {
-      // Next word
       handleNext();
       return;
     }
 
+    if (!input.trim()) return;
+
     const check = checkAnswer(input, target, currentWord.respuestasAlternativas);
     setFeedback({ result: check.result, correct: target, distance: check.distance });
     
-    
-    // Play sound
-    if (check.result === 'correct') {
-      sfx.playCorrect();
-    } else if (check.result === 'almost') {
-      sfx.playAlmost();
-    } else {
-      sfx.playIncorrect();
-    }
+    if (check.result === 'correct') sfx.playCorrect();
+    else if (check.result === 'almost') sfx.playAlmost();
+    else sfx.playIncorrect();
   };
 
   const handleNext = () => {
@@ -86,9 +76,6 @@ export default function PlayPage() {
       
       if (currentWordIndex >= words.length - 1) {
         router.push("/game/results");
-      } else {
-        // Focus input
-        setTimeout(() => inputRef.current?.focus(), 100);
       }
     }
   };
@@ -100,90 +87,139 @@ export default function PlayPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] max-w-2xl mx-auto px-4">
-      {/* Progress */}
-      <div className="w-full bg-white/10 h-2 rounded-full mb-12 overflow-hidden">
-        <motion.div 
-          className="h-full bg-[var(--brand-primary)]"
-          initial={{ width: 0 }}
-          animate={{ width: `${((currentWordIndex) / words.length) * 100}%` }}
-        />
+    <div className="flex flex-col items-center justify-center min-h-[85vh] max-w-3xl mx-auto px-4 relative">
+      
+      {/* Header Progress */}
+      <div className="absolute top-0 w-full flex items-center justify-between p-4">
+         <div className="text-gray-400 font-mono text-sm">
+            {currentWordIndex + 1} / {words.length}
+         </div>
+         <div className="w-32 h-2 bg-white/10 rounded-full overflow-hidden">
+            <motion.div 
+               className="h-full bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-secondary)]"
+               initial={{ width: 0 }}
+               animate={{ width: `${((currentWordIndex) / words.length) * 100}%` }}
+               transition={{ duration: 0.5 }}
+            />
+         </div>
       </div>
 
-      {/* Card */}
       <AnimatePresence mode="wait">
         <motion.div
           key={currentWord.id}
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: -20 }}
-          className="w-full"
+          exit={{ opacity: 0, scale: 0.95, y: -20 }}
+          transition={{ duration: 0.3 }}
+          className="w-full glass-panel p-8 md:p-12 shadow-2xl relative overflow-hidden"
         >
-          <div className="text-center mb-12">
-            <h2 className="text-gray-400 text-sm uppercase tracking-wider mb-4">Traduce esta palabra</h2>
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">{prompt}</h1>
-            <Button variant="ghost" size="sm" onClick={() => speak(prompt, targetLang === 'en-US' ? 'es-ES' : 'en-US')}>
-              <Volume2 className="h-6 w-6 text-[var(--brand-secondary)]" />
-            </Button>
+          {/* Background Gradient for Card */}
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[var(--brand-primary)] via-[var(--brand-secondary)] to-[var(--brand-accent)]" />
+
+          <div className="text-center mb-10">
+            <span className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold tracking-widest text-gray-400 mb-6 uppercase">
+                Traduce al {isEsEn ? 'Inglés' : 'Español'}
+            </span>
+            
+            <div className="relative group cursor-pointer" onClick={() => speak(prompt, targetLang === 'en-US' ? 'es-ES' : 'en-US')}>
+                <h1 className="text-5xl md:text-7xl font-bold text-white mb-2 tracking-tight">
+                    {prompt}
+                </h1>
+                <Volume2 className="w-6 h-6 text-gray-500 mx-auto opacity-0 group-hover:opacity-100 transition-opacity absolute -right-8 top-1/2 -translate-y-1/2" />
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="relative">
+          <form onSubmit={handleSubmit} className="space-y-8 max-w-md mx-auto">
+            <div className="relative group">
               <input
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 disabled={!!feedback}
-                className={`w-full bg-transparent border-b-2 text-center text-3xl md:text-4xl py-4 focus:outline-none transition-colors ${
+                className={`w-full bg-black/20 border-b-2 text-center text-3xl md:text-4xl py-4 focus:outline-none transition-all duration-300 font-medium ${
                     feedback 
                     ? feedback.result === 'correct' 
-                        ? 'border-green-500 text-green-500' 
-                        : 'border-red-500 text-red-500' 
-                    : 'border-gray-600 focus:border-[var(--brand-primary)] text-white'
+                        ? 'border-green-500 text-green-400' 
+                        : 'border-red-500 text-red-400' 
+                    : 'border-white/20 focus:border-[var(--brand-primary)] text-white placeholder:text-white/20'
                 }`}
-                placeholder="Escribe tu respuesta..."
-                autoFocus
+                placeholder="Escribe aquí..."
                 autoComplete="off"
+                spellCheck={false}
               />
             </div>
 
-            {/* Feedback */}
-            <AnimatePresence>
-              {feedback && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className={`rounded-xl p-4 text-center ${
-                    feedback.result === 'correct' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-white'
-                  }`}
-                >
-                  {feedback.result === 'correct' && (
-                    <div className="text-xl font-bold">¡Correcto! 🎉</div>
-                  )}
-                  {feedback.result === 'almost' && (
-                    <div>
-                      <div className="text-xl font-bold text-yellow-400">¡Casi! 🤔</div>
-                      <p className="text-sm mt-1">Tu respuesta: <span className="line-through opacity-70">{input}</span></p>
-                      <p className="text-sm">Correcta: <span className="font-bold">{feedback.correct}</span></p>
-                    </div>
-                  )}
-                  {feedback.result === 'incorrect' && (
-                    <div>
-                      <div className="text-xl font-bold text-red-500">Incorrecto 😔</div>
-                      <p className="mt-2 text-lg">La respuesta correcta es: <span className="font-bold text-green-400">{feedback.correct}</span></p>
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Visual Feedback Area */}
+            <div className="h-32 flex items-center justify-center">
+                <AnimatePresence mode="wait">
+                {feedback ? (
+                    <motion.div
+                        key="feedback"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="text-center w-full"
+                    >
+                         {feedback.result === 'correct' && (
+                            <div className="flex flex-col items-center gap-2">
+                                <CheckCircle className="w-12 h-12 text-green-400" />
+                                <span className="text-2xl font-bold text-green-400">¡Correcto!</span>
+                            </div>
+                         )}
+                         {feedback.result === 'almost' && (
+                            <div className="flex flex-col items-center gap-2">
+                                <AlertCircle className="w-12 h-12 text-yellow-400" />
+                                <span className="text-2xl font-bold text-yellow-400">¡Casi!</span>
+                                <div className="bg-white/5 px-4 py-2 rounded-lg border border-white/10 mt-2">
+                                    <span className="text-gray-400 text-sm">Respuesta: </span>
+                                    <span className="text-white font-bold">{feedback.correct}</span>
+                                </div>
+                            </div>
+                         )}
+                         {feedback.result === 'incorrect' && (
+                            <div className="flex flex-col items-center gap-2">
+                                <XCircle className="w-12 h-12 text-red-400" />
+                                <span className="text-2xl font-bold text-red-400">Incorrecto</span>
+                                <div className="bg-red-500/10 px-6 py-3 rounded-xl border border-red-500/20 mt-2">
+                                    <span className="text-red-200 text-sm mr-2">La solución era:</span>
+                                    <span className="text-white font-bold text-lg">{feedback.correct}</span>
+                                </div>
+                            </div>
+                         )}
+                    </motion.div>
+                ) : (
+                    <motion.div 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        exit={{ opacity: 0 }}
+                        className="text-gray-600 text-sm"
+                    >
+                        Presiona <kbd className="font-sans px-2 py-1 bg-white/10 rounded-md border border-white/5 ml-1">Enter</kbd> para comprobar
+                    </motion.div>
+                )}
+                </AnimatePresence>
+            </div>
             
-            <Button
-                type="submit" 
-                size="lg" 
-                className={`w-full h-16 text-lg ${feedback ? (feedback.result === 'correct' ? 'bg-green-500 hover:bg-green-600' : 'bg-[var(--brand-secondary)]') : ''}`}
-            >
-                {feedback ? "Siguiente" : "Comprobar"}
-            </Button>
+            <AnimatePresence>
+                {feedback && (
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                         <Button
+                            type="button"
+                            onClick={handleNext}
+                            size="lg" 
+                            className={`w-full h-16 text-xl shadow-lg ${
+                                feedback.result === 'correct' 
+                                ? 'bg-green-500 hover:bg-green-600 shadow-green-500/20' 
+                                : feedback.result === 'incorrect'
+                                ? 'bg-red-500 hover:bg-red-600 shadow-red-500/20'
+                                : 'bg-yellow-500 hover:bg-yellow-600 shadow-yellow-500/20 text-black'
+                            }`}
+                        >
+                            Continuar <ArrowRight className="ml-2 w-6 h-6" />
+                        </Button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
           </form>
         </motion.div>
       </AnimatePresence>

@@ -97,6 +97,11 @@ export const dbService = {
     const db = await getDB();
     await db.put('palabras', palabra);
   },
+
+  async deletePalabra(id: string): Promise<void> {
+    const db = await getDB();
+    await db.delete('palabras', id);
+  },
   
   async updatePalabraStats(id: string, acierto: boolean): Promise<void> {
     const db = await getDB();

@@ -134,11 +134,18 @@ export default function PlayPage() {
           className="w-full relative perspective-1000"
         >
           {/* THE CARD */}
-          <div className={`
-                relative w-full aspect-[4/5] md:aspect-[16/9] max-h-[600px]
+          <motion.div 
+            animate={
+                feedback?.result === 'incorrect' ? { x: [-10, 10, -10, 10, 0] } :
+                feedback?.result === 'correct' ? { scale: [1, 1.05, 1] } :
+                {}
+            }
+            transition={{ duration: 0.4 }}
+            className={`
+                relative w-full min-h-[500px] md:min-h-[600px]
                 rounded-[2rem] md:rounded-[3rem] 
                 flex flex-col items-center justify-center 
-                border-2 overflow-hidden
+                border-2 
                 transition-colors duration-500
                 ${feedback?.result === 'correct' 
                     ? 'bg-green-500/10 border-green-500/30 shadow-[0_0_100px_-20px_rgba(34,197,94,0.3)]' 
@@ -158,12 +165,27 @@ export default function PlayPage() {
                     <span className="text-[var(--brand-secondary)] font-bold tracking-[0.2em] text-xs md:text-sm uppercase mb-4 block">
                         Traduce al {isEsEn ? 'Inglés' : 'Español'}
                     </span>
-                    <h1 
-                        className="text-4xl md:text-6xl font-black text-white cursor-pointer hover:scale-105 transition-transform leading-tight"
-                        onClick={() => speak(prompt, targetLang === 'en-US' ? 'es-ES' : 'en-US')}
-                    >
-                        {prompt}
-                    </h1>
+                    
+                    <div className="flex flex-col items-center gap-4">
+                         <h1 
+                            className="text-4xl md:text-6xl font-black text-white leading-tight"
+                        >
+                            {prompt}
+                        </h1>
+
+                        <Button 
+                            variant="ghost" 
+                            className="rounded-full w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 text-[var(--brand-primary)] animate-pulse hover:animate-none hover:scale-110 transition-all"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                speak(prompt, targetLang === 'en-US' ? 'es-ES' : 'en-US');
+                            }}
+                            title="Escuchar pronunciación"
+                        >
+                             <Volume2 className="w-6 h-6 md:w-8 md:h-8" />
+                        </Button>
+                    </div>
+
                 </motion.div>
 
                 {/* Input Area */}
@@ -185,11 +207,11 @@ export default function PlayPage() {
                                     autoFocus
                                     autoComplete="off"
                                 />
-                                <div className="mt-8 md:hidden">
+                                <div className="mt-8 flex justify-center">
                                      <Button 
                                         size="lg" 
                                         onClick={processAnswer} 
-                                        className="w-full shadow-lg bg-[var(--brand-primary)] text-white"
+                                        className="w-full md:w-auto px-12 py-6 text-xl shadow-lg bg-[var(--brand-primary)] text-white hover:scale-105 active:scale-95 transition-all"
                                      >
                                          Comprobar
                                      </Button>
@@ -244,7 +266,7 @@ export default function PlayPage() {
 
               {/* Background Glows */}
               <div aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-[var(--brand-primary)]/10 via-transparent to-[var(--brand-secondary)]/10 blur-3xl -z-10" />
-          </div>
+          </motion.div>
 
         </motion.div>
       </AnimatePresence>

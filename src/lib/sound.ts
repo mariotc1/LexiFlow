@@ -1,6 +1,4 @@
-// Basic sound synthesis to avoid external assets for now, or use placeholder URLs
-// For a premium feel, real assets are better, but we can synthesize "8-bit" or "modern" beeps.
-// Let's use simple oscillator-based sounds for "Kahoot-like" feedback without assets.
+// Basic sound synthesis using Web Audio API for a premium, asset-free experience.
 
 class SoundFX {
   private ctx: AudioContext | null = null;
@@ -8,8 +6,7 @@ class SoundFX {
 
   constructor() {
     if (typeof window !== 'undefined') {
-      // Init on first user interaction usually
-      this.soundEnabled = true; // controlled by store
+      this.soundEnabled = true;
     }
   }
   
@@ -24,10 +21,16 @@ class SoundFX {
     this.soundEnabled = enabled;
   }
 
-  private playTone(freq: number, type: OscillatorType, duration: number, startTime = 0) {
+  private async playTone(freq: number, type: OscillatorType, duration: number, startTime = 0, vol = 0.1) {
     if (!this.soundEnabled) return;
     try {
         const ctx = this.getCtx();
+        
+        // Critical: Browsers block audio until interaction. Resume if suspended.
+        if (ctx.state === 'suspended') {
+            await ctx.resume();
+        }
+
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         
@@ -40,45 +43,54 @@ class SoundFX {
         const now = ctx.currentTime + startTime;
         osc.start(now);
         
-        gain.gain.setValueAtTime(0.1, now);
+        // Envelope to prevent clicking/cutting
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(vol, now + 0.01);
         gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
         
-        osc.stop(now + duration);
+        osc.stop(now + duration + 0.1); // slight buffer
     } catch(e) {
-        console.error(e);
+        console.error("Sound Playback Error:", e);
     }
   }
 
   public playCorrect() {
-    // Digging coin sound / Positive Ding
-    this.playTone(800, 'sine', 0.1);
-    this.playTone(1200, 'sine', 0.3, 0.1);
+    // Nice Major Chord (C5 Major)
+    // C5 = 523.25, E5 = 659.25, G5 = 783.99
+    const now = 0;
+    this.playTone(523.25, 'sine', 0.4, now, 0.1);
+    this.playTone(659.25, 'sine', 0.4, now + 0.05, 0.1);
+    this.playTone(783.99, 'sine', 0.6, now + 0.1, 0.1);
+    // High sparkle
+    this.playTone(1046.50, 'triangle', 0.3, now + 0.1, 0.05);
   }
 
   public playIncorrect() {
-    // Low thud
-    this.playTone(200, 'sawtooth', 0.1);
-    this.playTone(150, 'sawtooth', 0.3, 0.1);
+    // Dissonant / Error thud
+    this.playTone(150, 'sawtooth', 0.3, 0, 0.15);
+    this.playTone(140, 'sawtooth', 0.3, 0.05, 0.15);
   }
   
   public playAlmost() {
-     // Questioning tone similar to incorrect but softer
-     this.playTone(300, 'triangle', 0.2);
-     this.playTone(400, 'triangle', 0.2, 0.2);
+     // Questioning / Uncertain
+     this.playTone(330, 'triangle', 0.3, 0, 0.1);
+     this.playTone(349, 'triangle', 0.3, 0.15, 0.1); // Discomforting interval
   }
 
   public playWin() {
-    // Fanfare
+    // Victory Fanfare
     const now = 0;
-    this.playTone(440, 'square', 0.2, now);
-    this.playTone(554, 'square', 0.2, now + 0.2);
-    this.playTone(659, 'square', 0.4, now + 0.4);
-    this.playTone(880, 'square', 0.8, now + 0.8);
+    const speed = 0.12;
+    // C G E A G ...
+    this.playTone(523.25, 'square', speed, now, 0.1);
+    this.playTone(659.25, 'square', speed, now + speed, 0.1);
+    this.playTone(783.99, 'square', speed, now + speed*2, 0.1);
+    this.playTone(1046.50, 'square', 0.6, now + speed*3, 0.1);
   }
   
   public playClick() {
-      // Soft click
-      this.playTone(800, 'triangle', 0.05);
+      // Crisp click
+      this.playTone(1200, 'sine', 0.05, 0, 0.05);
   }
 }
 

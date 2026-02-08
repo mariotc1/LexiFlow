@@ -109,10 +109,10 @@ export default function PlayPage() {
   // --- Visuals ---
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[90vh] max-w-4xl mx-auto px-4 relative">
+    <div className="flex flex-col items-center justify-start md:justify-center min-h-[calc(100vh-100px)] max-w-4xl mx-auto px-4 relative pt-12 md:pt-0">
       
       {/* Top Bar */}
-      <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-20">
+      <div className="absolute top-0 left-4 right-4 flex items-center justify-between z-20 h-16 md:top-4">
           <Button variant="ghost" size="sm" onClick={handleFinishNow} className="text-red-400 hover:text-red-300 hover:bg-red-500/10 gap-2">
               <Flag className="w-4 h-4" /> <span className="hidden md:inline">Terminar Ahora</span>
           </Button>
@@ -122,7 +122,7 @@ export default function PlayPage() {
       </div>
 
       {/* Sci-Fi Progress Bar */}
-      <div className="absolute top-0 left-0 w-full h-2 z-50 bg-gray-900/20">
+      <div className="absolute top-0 left-0 w-full h-1 md:h-2 z-50 bg-gray-900/20">
         <div className="w-full h-full relative overflow-hidden">
              <div className="absolute inset-0 bg-white/5 backdrop-blur-sm" />
              <motion.div 
@@ -148,7 +148,7 @@ export default function PlayPage() {
           animate={{ opacity: 1, scale: 1, rotateX: 0 }}
           exit={{ opacity: 0, scale: 1.05, filter: "blur(10px)" }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="w-full relative perspective-1000"
+          className="w-full relative perspective-1000 mt-4 md:mt-0"
         >
           {/* THE CARD */}
           <motion.div 
@@ -159,7 +159,7 @@ export default function PlayPage() {
             }
             transition={{ duration: 0.4 }}
             className={`
-                relative w-full min-h-[500px] md:min-h-[600px]
+                relative w-full min-h-[400px] md:min-h-[600px]
                 rounded-[2rem] md:rounded-[3rem] 
                 flex flex-col items-center justify-center 
                 border-2 
@@ -173,7 +173,7 @@ export default function PlayPage() {
           `}>
              
               {/* Giant Prompt */}
-              <div className="text-center z-10 p-6 md:p-8 w-full flex flex-col justify-center h-full">
+              <div className="text-center z-10 p-4 md:p-8 w-full flex flex-col justify-center h-full">
                 <motion.div 
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
@@ -185,21 +185,21 @@ export default function PlayPage() {
                     
                     <div className="flex flex-col items-center gap-4">
                          <h1 
-                            className="text-4xl md:text-6xl font-black text-white leading-tight"
+                            className="text-3xl md:text-6xl font-black text-white leading-tight break-words max-w-full"
                         >
                             {prompt}
                         </h1>
 
                         <Button 
                             variant="ghost" 
-                            className="rounded-full w-12 h-12 md:w-16 md:h-16 flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 text-[var(--brand-primary)] animate-pulse hover:animate-none hover:scale-110 transition-all"
+                            className="rounded-full w-10 h-10 md:w-16 md:h-16 flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 text-[var(--brand-primary)] animate-pulse hover:animate-none hover:scale-110 transition-all"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 speak(prompt, targetLang === 'en-US' ? 'es-ES' : 'en-US');
                             }}
                             title="Escuchar pronunciación"
                         >
-                             <Volume2 className="w-6 h-6 md:w-8 md:h-8" />
+                             <Volume2 className="w-5 h-5 md:w-8 md:h-8" />
                         </Button>
                     </div>
 
@@ -224,7 +224,7 @@ export default function PlayPage() {
                                     autoFocus
                                     autoComplete="off"
                                 />
-                                <div className="mt-8 flex justify-center">
+                                <div className="mt-6 md:mt-8 flex justify-center">
                                      <Button 
                                         size="lg" 
                                         onClick={processAnswer} 
@@ -260,7 +260,7 @@ export default function PlayPage() {
                                     </div>
                                 )}
                                 
-                                <div className="mt-8 w-full flex flex-col items-center gap-4">
+                                <div className="mt-6 md:mt-8 w-full flex flex-col items-center gap-4">
                                     <Button 
                                         onClick={nextCard} 
                                         size="lg" 

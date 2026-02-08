@@ -84,15 +84,15 @@ export default function Home() {
   };
 
   return (
-    <div className="space-y-12 pb-20 max-w-6xl mx-auto">
+    <div className="space-y-12 pb-20 max-w-6xl mx-auto px-2 md:px-0">
       
       {/* 1. HERO SECTION */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-8 py-8 border-b border-white/5">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-8 py-8 border-b border-white/5 text-center md:text-left">
         <div className="space-y-2">
            <motion.div 
              initial={{ opacity: 0, x: -20 }}
              animate={{ opacity: 1, x: 0 }}
-             className="flex items-center gap-2 text-[var(--brand-secondary)] uppercase tracking-widest font-bold text-xs"
+             className="flex items-center justify-center md:justify-start gap-2 text-[var(--brand-secondary)] uppercase tracking-widest font-bold text-xs"
            >
               <div className="w-2 h-2 bg-[var(--brand-secondary)] rounded-full animate-pulse" />
               LEXIFLOW SYSTEM
@@ -101,7 +101,7 @@ export default function Home() {
            <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">
              HOLA, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-secondary)]">{userName || 'INVITADO'}</span>
            </h1>
-           <p className="text-gray-400 text-lg max-w-lg">
+           <p className="text-gray-400 text-lg max-w-lg mx-auto md:mx-0">
              Tu centro de entrenamiento. <span className="text-green-400 font-bold">Todo listo.</span>
            </p>
         </div>
@@ -110,10 +110,10 @@ export default function Home() {
             <div className="absolute inset-0 bg-[var(--brand-primary)] blur-3xl opacity-20 group-hover:opacity-40 transition-opacity rounded-full" />
             <Link href="/game">
                 <Button 
-                    className="relative w-48 h-48 rounded-full border-4 border-[var(--brand-primary)]/30 bg-black/50 backdrop-blur-md flex flex-col items-center justify-center gap-4 hover:scale-105 active:scale-95 transition-all group-hover:border-[var(--brand-primary)] shadow-[0_0_50px_-10px_var(--brand-primary)]"
+                    className="relative w-40 h-40 md:w-48 md:h-48 rounded-full border-4 border-[var(--brand-primary)]/30 bg-black/50 backdrop-blur-md flex flex-col items-center justify-center gap-4 hover:scale-105 active:scale-95 transition-all group-hover:border-[var(--brand-primary)] shadow-[0_0_50px_-10px_var(--brand-primary)]"
                 >
-                    <Play className="w-16 h-16 fill-[var(--brand-primary)] text-[var(--brand-primary)] group-hover:text-white transition-colors" />
-                    <span className="font-bold text-xl uppercase tracking-widest text-white">INICIAR</span>
+                    <Play className="w-12 h-12 md:w-16 md:h-16 fill-[var(--brand-primary)] text-[var(--brand-primary)] group-hover:text-white transition-colors" />
+                    <span className="font-bold text-lg md:text-xl uppercase tracking-widest text-white">INICIAR</span>
                 </Button>
             </Link>
         </div>
@@ -145,7 +145,7 @@ export default function Home() {
       </div>
 
       {/* 3. OPERATIONS DECK */}
-      <h2 className="text-xs font-mono uppercase tracking-[0.2em] text-gray-500 mt-8 mb-4">Operations Deck</h2>
+      <h2 className="text-xs font-mono uppercase tracking-[0.2em] text-gray-500 mt-8 mb-4 text-center md:text-left">Operations Deck</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Link href="/topics">
                 <NeonCard color="primary" className="h-full" delay={0.4}>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { MobileNav } from "@/components/layout/MobileNav";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 
@@ -17,10 +18,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${outfit.variable} font-sans antialiased min-h-screen`}>
+      <body className={`${outfit.variable} font-sans antialiased min-h-screen bg-[#050505]`}>
         <div className="flex min-h-screen">
           <Sidebar />
-          <main className="flex-1 md:ml-72 p-6 overflow-y-auto h-screen">
+          <MobileNav />
+          <main className="flex-1 md:ml-72 p-4 md:p-6 overflow-y-auto h-screen pt-20 md:pt-6">
             <div className="mx-auto max-w-6xl">
               {children}
             </div>

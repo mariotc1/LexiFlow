@@ -63,9 +63,14 @@ export default function PlayPage() {
       }
   }, [feedback, submitAnswer, currentWordIndex, words.length, router]);
 
+
+  const [isFinishModalOpen, setIsFinishModalOpen] = useState(false);
+
   // Unified Global Key Handler
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
+        if (isFinishModalOpen) return; // Disable keys when modal is open
+
         if (e.key === 'Enter') {
             e.preventDefault();
             if (feedback) {
@@ -78,17 +83,19 @@ export default function PlayPage() {
 
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [feedback, nextCard, processAnswer]);
+  }, [feedback, nextCard, processAnswer, isFinishModalOpen]);
 
 
   const handleFinishNow = () => {
-      if (confirm("¿Terminar y ver resultados? Las palabras restantes contarán como FALLOS.")) {
-          let remaining = words.length - currentWordIndex;
-          for (let i = 0; i < remaining; i++) {
-             submitAnswer(false); 
-          }
-          router.push("/game/results");
+      setIsFinishModalOpen(true);
+  };
+
+  const confirmFinish = () => {
+      let remaining = words.length - currentWordIndex;
+      for (let i = 0; i < remaining; i++) {
+         submitAnswer(false); 
       }
+      router.push("/game/results");
   };
 
   const speak = (text: string, lang: string) => {
@@ -270,6 +277,42 @@ export default function PlayPage() {
 
         </motion.div>
       </AnimatePresence>
+
+      {/* CUSTOM MODAL */}
+      <AnimatePresence>
+        {isFinishModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                <motion.div 
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    className="bg-[#1a1a20] border border-white/10 p-8 rounded-2xl max-w-md w-full shadow-2xl relative overflow-hidden"
+                >
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-orange-500" />
+                    
+                    <h2 className="text-2xl font-bold text-white mb-4">¿Te rindes tan pronto?</h2>
+                    
+                    <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl mb-6 flex gap-4 items-start">
+                        <AlertCircle className="w-6 h-6 text-red-400 shrink-0 mt-1" />
+                        <p className="text-red-200 text-sm leading-relaxed">
+                            Si terminas ahora, las <strong>{words.length - currentWordIndex} palabras restantes</strong> contarán como <strong className="text-red-400">FALLOS</strong> en tus estadísticas.
+                        </p>
+                    </div>
+
+                    <div className="flex gap-3 justify-end">
+                        <Button variant="ghost" onClick={() => setIsFinishModalOpen(false)}>
+                            Cancelar
+                        </Button>
+                        <Button onClick={confirmFinish} className="bg-red-600 hover:bg-red-700 text-white">
+                            Sí, terminar la partida
+                        </Button>
+                    </div>
+                </motion.div>
+            </div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
+
 }

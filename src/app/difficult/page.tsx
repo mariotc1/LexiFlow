@@ -6,7 +6,9 @@ import { Palabra } from "@/types";
 import { useGameStore } from "@/stores";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
-import { AlertTriangle, Play, Brain, CheckCircle } from "lucide-react";
+import { AlertTriangle, Play, Brain, CheckCircle, Flame, ShieldAlert, Activity } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { NeonCard } from "@/components/ui/NeonCard";
 
 export default function DifficultWordsPage() {
   const [words, setWords] = useState<Palabra[]>([]);
@@ -32,72 +34,94 @@ export default function DifficultWordsPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-10 pb-12">
+    <div className="max-w-7xl mx-auto space-y-10 pb-20 pt-4 px-4 min-h-[90vh]">
+      
       {/* Header */}
-      <div className="flex items-center gap-6">
-        <div className="p-4 bg-red-500/10 rounded-2xl text-red-500 border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
-            <Brain className="h-10 w-10" />
-        </div>
+      <div className="flex flex-col md:flex-row items-end justify-between gap-6 border-b border-white/5 py-6">
         <div>
-            <h1 className="text-4xl font-bold text-white tracking-tight">Práctica Focalizada</h1>
-            <p className="text-lg text-gray-400">El sistema detecta automáticamente las palabras que te cuestan más.</p>
+             <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center gap-2 text-red-500 uppercase tracking-widest font-bold text-xs mb-2"
+            >
+                <ShieldAlert className="w-4 h-4 animate-pulse" />
+                PROTOCOLOS DAÑADOS DETECTADOS
+            </motion.div>
+            <h1 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">ZONA CRÍTICA</span>
+            </h1>
+            <p className="text-gray-400 mt-2 max-w-xl">
+                El sistema ha aislado {words.length} conceptos con alta tasa de fallo. Se requiere intervención inmediata.
+            </p>
         </div>
+        
+        {!loading && words.length > 0 && (
+            <Button 
+                size="lg" 
+                onClick={handleStart} 
+                className="w-full md:w-auto px-8 h-16 text-lg font-black uppercase tracking-widest shadow-[0_0_30px_-5px_var(--red-500)] bg-red-600 hover:bg-red-700 border border-red-400/30"
+            >
+                <Activity className="mr-3 h-6 w-6 animate-bounce" /> INICIAR REPARACIÓN DE MEMORIA
+            </Button>
+        )}
       </div>
 
       {loading ? (
-        <div className="text-center py-24 text-gray-500 animate-pulse text-xl">Analizando tu rendimiento...</div>
+        <div className="flex flex-col items-center justify-center py-24 gap-4">
+             <div className="w-16 h-16 border-4 border-red-500/20 border-t-red-500 rounded-full animate-spin" />
+             <div className="text-red-500 font-mono animate-pulse uppercase tracking-widest">Escaneando red neuronal...</div>
+        </div>
       ) : words.length === 0 ? (
-        <div className="glass-panel p-16 text-center space-y-6 border border-green-500/20 bg-green-500/5 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-emerald-600" />
-            <div className="mx-auto w-24 h-24 rounded-full bg-green-500/10 flex items-center justify-center mb-6">
-                <CheckCircle className="w-12 h-12 text-green-400" />
+        <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
+            <div className="relative mb-8">
+                 <div className="absolute inset-0 bg-green-500/20 blur-3xl rounded-full" />
+                 <CheckCircle className="w-32 h-32 text-green-400 relative z-10" />
             </div>
-            <h2 className="text-3xl font-bold text-white">¡Todo Dominado!</h2>
-            <p className="text-xl text-gray-400 max-w-lg mx-auto">
-                No tienes palabras marcadas como "difíciles" en este momento. ¡Sigue jugando para desafiarte más!
+            <h2 className="text-4xl font-black text-white mb-4 uppercase">SISTEMA ESTABLE</h2>
+            <p className="text-xl text-gray-400 max-w-lg mx-auto mb-8">
+                No se detectan anomalías en la memoria a largo plazo. Todas las palabras están bajo control.
             </p>
-            <div className="pt-6">
-                <Button size="lg" onClick={() => router.push('/game')} className="shadow-lg shadow-green-500/20">
-                    Jugar Modo Normal
-                </Button>
-            </div>
+            <Button size="lg" onClick={() => router.push('/game')} className="h-14 px-8 text-lg font-bold shadow-[0_0_20px_-5px_var(--brand-primary)]">
+                REGRESAR A ENTRENAMIENTO ESTÁNDAR
+            </Button>
         </div>
       ) : (
-        <div className="space-y-8">
-            <div className="glass-panel p-8 flex flex-col md:flex-row justify-between items-center gap-6">
-                <div>
-                    <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                         <AlertTriangle className="text-yellow-500 w-6 h-6" />
-                         {words.length} palabras prioritarias
-                    </h3>
-                    <p className="text-gray-400 mt-1">Estas palabras tienen una tasa de error superior al acierto.</p>
-                </div>
-                <Button size="lg" onClick={handleStart} className="w-full md:w-auto px-8 h-14 text-lg shadow-xl shadow-red-500/20 hover:scale-105 transition-transform bg-red-600 hover:bg-red-700 border-none text-white">
-                    <Play className="mr-2 h-5 w-5" /> Iniciar Sesión de Repaso
-                </Button>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {words.map(w => (
-                    <div key={w.id} className="p-6 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-red-500/30 transition-all group relative overflow-hidden">
-                         <div className="absolute top-0 left-0 w-1 h-full bg-red-500/50 opacity-50 group-hover:opacity-100 transition-opacity" />
-                        <div className="flex justify-between items-start mb-2">
-                             <h4 className="text-xl font-bold text-white">{w.ingles}</h4>
-                             <span className="text-xs font-mono text-red-400 bg-red-500/10 px-2 py-1 rounded-md">
-                                 {w.fallos} fallos
-                             </span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <AnimatePresence>
+                {words.map((w, i) => (
+                    <NeonCard 
+                        key={w.id} 
+                        color="success" // Using 'success' prop but styling specifically below with red overrides if needed, or stick to standard color props. Actually NeonCard supports custom colors via className generally or I can add a 'danger' prop. 
+                        // Since I didn't add 'danger' to NeonCard props, I'll use a hack or just style standard.
+                        // Let's use standard NeonCard but style specific parts red.
+                        delay={i * 0.05}
+                        className="p-6 border-l-4 border-l-red-500 hover:bg-red-500/5 group"
+                        // Force override border color via inline style or class if strictly needed, but let's stick to the 'Clean' look.
+                    >
+                        <div className="flex justify-between items-start mb-4">
+                             <div className="bg-red-500/10 p-3 rounded-lg text-red-500 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                                <AlertTriangle className="w-6 h-6" />
+                             </div>
+                             <div className="text-xs font-mono text-red-400 bg-red-950/30 px-2 py-1 rounded border border-red-500/20">
+                                 {w.fallos} ERRORES CRÍTICOS
+                             </div>
                         </div>
-                        <div className="text-gray-400">{w.espanol}</div>
                         
-                        <div className="mt-4 w-full bg-gray-700/30 h-1.5 rounded-full overflow-hidden">
+                        <h4 className="text-2xl font-black text-white mb-1">{w.ingles}</h4>
+                        <div className="text-lg text-gray-400 font-mono mb-4">{w.espanol}</div>
+                        
+                        <div className="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
                              <div 
-                                className="h-full bg-red-500" 
-                                style={{ width: `${Math.min(100, (w.fallos / (w.aciertos + w.fallos) * 100))}%` }} 
+                                className="h-full bg-red-500 shadow-[0_0_10px_red]" 
+                                style={{ width: `${Math.min(100, (w.fallos / (w.aciertos + w.fallos || 1) * 100))}%` }} 
                              />
                         </div>
-                    </div>
+                        <div className="mt-2 text-[10px] text-gray-500 text-right uppercase tracking-wider font-bold">
+                            TASA DE FALLO: {Math.round((w.fallos / (w.aciertos + w.fallos || 1) * 100))}%
+                        </div>
+                    </NeonCard>
                 ))}
-            </div>
+            </AnimatePresence>
         </div>
       )}
     </div>

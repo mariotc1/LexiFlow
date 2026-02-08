@@ -92,18 +92,17 @@ export default function Home() {
            <motion.div 
              initial={{ opacity: 0, x: -20 }}
              animate={{ opacity: 1, x: 0 }}
-             className="flex items-center gap-2 text-[var(--brand-secondary)] uppercase tracking-[0.2em] font-mono text-xs md:text-sm"
+             className="flex items-center gap-2 text-[var(--brand-secondary)] uppercase tracking-widest font-bold text-xs"
            >
-              <span className="w-2 h-2 bg-[var(--brand-secondary)] rounded-full animate-pulse" />
-              System Online
+              <div className="w-2 h-2 bg-[var(--brand-secondary)] rounded-full animate-pulse" />
+              LEXIFLOW SYSTEM
            </motion.div>
            
-           <h1 className="text-5xl md:text-7xl font-black text-white leading-tight">
-             HOLA, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-secondary)] uppercase">{userName || 'OPERATOR'}</span>
+           <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">
+             HOLA, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-secondary)]">{userName || 'INVITADO'}</span>
            </h1>
-           <p className="text-gray-400 text-lg md:text-xl max-w-lg">
-             Tu centro de comando para el dominio de idiomas. <br/>
-             Estado actual: <span className="text-green-400">Listo para entrenamiento.</span>
+           <p className="text-gray-400 text-lg max-w-lg">
+             Tu centro de entrenamiento. <span className="text-green-400 font-bold">Todo listo.</span>
            </p>
         </div>
 
@@ -182,28 +181,28 @@ export default function Home() {
       <Modal
         isOpen={showNameModal}
         onClose={() => {}} 
-        title="Protocolo de Identificación"
+        title="Bienvenido a LexiFlow"
       >
         <form onSubmit={handleSaveName} className="space-y-6">
           <div className="text-center">
             <div className="mb-4 inline-block p-4 rounded-full bg-[var(--brand-primary)]/20 text-[var(--brand-primary)] animate-pulse">
                 <Brain className="w-12 h-12" />
             </div>
-            <p className="text-gray-300 mb-4 font-mono text-sm">
-              IDENTIFÍCATE PARA ACCEDER AL SISTEMA
+            <p className="text-gray-300 mb-4 text-sm">
+              Para guardar tu progreso, necesitamos saber tu nombre.
             </p>
           </div>
           <div>
             <Input
               value={nameInput}
               onChange={(e) => setNameInput(e.target.value)}
-              placeholder="NOMBRE DE OPERADOR..."
-              className="text-center text-lg h-14 bg-black/50 border-[var(--brand-primary)]/50 focus:border-[var(--brand-primary)] font-mono text-white tracking-wider"
+              placeholder="Tu nombre..."
+              className="text-center text-lg h-14 bg-black/50 border-[var(--brand-primary)]/50 focus:border-[var(--brand-primary)] text-white tracking-wider"
               autoFocus
             />
           </div>
-          <Button type="submit" size="lg" className="w-full font-mono font-bold tracking-widest" disabled={!nameInput.trim()}>
-            ACCEDER AL TERMINAL &gt;
+          <Button type="submit" size="lg" className="w-full font-bold tracking-widest" disabled={!nameInput.trim()}>
+            COMENZAR &gt;
           </Button>
         </form>
       </Modal>

@@ -7,9 +7,10 @@ import { useTemaStore } from "@/stores";
 import { parseTextContent, performOCR, ParsedWord, parseTxtFile } from "@/lib/import";
 import { dbService } from "@/lib/db";
 import { useRouter } from "next/navigation";
-import { Upload, FileText, Type, Image as ImageIcon, Loader2, ArrowRight, Check, X, Sparkles, ChevronLeft } from "lucide-react";
+import { Upload, FileText, Type, Image as ImageIcon, Loader2, ArrowRight, Check, X, Sparkles, ChevronLeft, ScanLine } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { sfx } from "@/lib/sound";
+import { NeonCard } from "@/components/ui/NeonCard";
 
 type ImportMode = 'paste' | 'file' | 'ocr' | null;
 type Step = 'selection' | 'input' | 'review';
@@ -38,8 +39,6 @@ export default function ImportPage() {
   const goBack = () => {
     sfx.playClick();
     if (step === 'review') {
-        // If we have words, warn? Nah, just keep them for now or clear?
-        // Let's keep words but go back to input
         setStep('input');
     } else if (step === 'input') {
         setStep('selection');
@@ -135,24 +134,27 @@ export default function ImportPage() {
   return (
     <div className="max-w-7xl mx-auto min-h-[90vh] flex flex-col pt-4 pb-12">
       {/* Header / Nav */}
-      <div className="flex items-center justify-between mb-8 px-4">
+      <div className="flex items-center justify-between mb-8 px-4 border-b border-white/5 pb-6">
          <div className="flex items-center gap-4">
             {step !== 'selection' && (
-                <Button variant="ghost" onClick={goBack} className="rounded-full w-12 h-12 p-0 flex items-center justify-center bg-white/5 hover:bg-white/10">
+                <Button variant="ghost" onClick={goBack} className="rounded-full w-12 h-12 p-0 flex items-center justify-center bg-white/5 hover:bg-white/10 hover:text-[var(--brand-primary)]">
                     <ChevronLeft className="w-6 h-6" />
                 </Button>
             )}
             <div>
-                <h1 className="text-3xl font-bold text-white tracking-tight">
-                    {step === 'selection' && "Nueva Colección"}
-                    {step === 'input' && (mode === 'paste' ? "Pegar Texto" : mode === 'file' ? "Subir Archivo" : "Escanear Cámara")}
-                    {step === 'review' && "Revisar y Guardar"}
+                 <motion.div 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex items-center gap-2 text-[var(--brand-primary)] uppercase tracking-widest font-bold text-xs mb-1"
+                >
+                    <ScanLine className="w-4 h-4 animate-pulse" />
+                    INGESTA DE DATOS
+                </motion.div>
+                <h1 className="text-3xl font-black text-white tracking-tight uppercase">
+                    {step === 'selection' && "Fuente de Datos"}
+                    {step === 'input' && (mode === 'paste' ? "Entrada Manual" : mode === 'file' ? "Subir Archivo" : "Escaneo Óptico")}
+                    {step === 'review' && "Verificación de Datos"}
                 </h1>
-                <p className="text-gray-400">
-                    {step === 'selection' && "Selecciona cómo quieres importar tus palabras."}
-                    {step === 'input' && "Procesa tu contenido para extraer vocabulario."}
-                    {step === 'review' && `Se han detectado ${words.length} palabras.`}
-                </p>
             </div>
          </div>
       </div>
@@ -168,43 +170,46 @@ export default function ImportPage() {
                 className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-1"
             >
                 {/* BIG CARD 1: PASTE */}
-                <div 
+                <NeonCard 
+                    color="primary"
+                    delay={0}
                     onClick={() => selectMode('paste')}
-                    className="group glass-panel h-[60vh] flex flex-col items-center justify-center cursor-pointer relative overflow-hidden text-center p-8 hover:bg-white/5"
+                    className="flex flex-col items-center justify-center text-center p-8 h-[50vh] hover:cursor-pointer"
                 >
-                    <div className="absolute inset-0 bg-gradient-to-t from-blue-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="w-32 h-32 rounded-full bg-blue-500/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
-                        <Type className="w-16 h-16 text-blue-400" />
+                    <div className="w-24 h-24 rounded-full bg-[var(--brand-primary)]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 border border-[var(--brand-primary)]/20 shadow-[0_0_20px_-5px_var(--brand-primary)]">
+                        <Type className="w-10 h-10 text-[var(--brand-primary)]" />
                     </div>
-                    <h2 className="text-3xl font-bold text-white mb-4">Pegar Texto</h2>
-                    <p className="text-gray-400 max-w-xs text-lg">Copia desde cualquier lugar y pega aquí. Detectamos el formato automáticamente.</p>
-                </div>
+                    <h2 className="text-2xl font-black text-white mb-2 uppercase tracking-wide">Texto Directo</h2>
+                    <p className="text-gray-400 max-w-xs">Pegar contenido desde el portapapeles. Detección automática de formato.</p>
+                </NeonCard>
 
                 {/* BIG CARD 2: FILE */}
-                <div 
+                <NeonCard 
+                     color="secondary"
+                     delay={0.1}
                     onClick={() => selectMode('file')}
-                    className="group glass-panel h-[60vh] flex flex-col items-center justify-center cursor-pointer relative overflow-hidden text-center p-8 hover:bg-white/5"
+                    className="flex flex-col items-center justify-center text-center p-8 h-[50vh] hover:cursor-pointer"
                 >
-                    <div className="absolute inset-0 bg-gradient-to-t from-purple-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="w-32 h-32 rounded-full bg-purple-500/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
-                        <FileText className="w-16 h-16 text-purple-400" />
+                    <div className="w-24 h-24 rounded-full bg-[var(--brand-secondary)]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 border border-[var(--brand-secondary)]/20 shadow-[0_0_20px_-5px_var(--brand-secondary)]">
+                        <FileText className="w-10 h-10 text-[var(--brand-secondary)]" />
                     </div>
-                    <h2 className="text-3xl font-bold text-white mb-4">Subir Archivo</h2>
-                    <p className="text-gray-400 max-w-xs text-lg">Importa listas largas desde archivos .txt.</p>
-                </div>
+                    <h2 className="text-2xl font-black text-white mb-2 uppercase tracking-wide">Archivo TXT</h2>
+                    <p className="text-gray-400 max-w-xs">Importación masiva desde archivos de texto plano.</p>
+                </NeonCard>
 
                  {/* BIG CARD 3: OCR */}
-                 <div 
+                 <NeonCard 
+                     color="warning"
+                     delay={0.2}
                     onClick={() => selectMode('ocr')}
-                    className="group glass-panel h-[60vh] flex flex-col items-center justify-center cursor-pointer relative overflow-hidden text-center p-8 hover:bg-white/5"
+                    className="flex flex-col items-center justify-center text-center p-8 h-[50vh] hover:cursor-pointer"
                 >
-                    <div className="absolute inset-0 bg-gradient-to-t from-pink-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="w-32 h-32 rounded-full bg-pink-500/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
-                        <Sparkles className="w-16 h-16 text-pink-400" />
+                    <div className="w-24 h-24 rounded-full bg-orange-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 border border-orange-500/20 shadow-[0_0_20px_-5px_orange]">
+                        <ScanLine className="w-10 h-10 text-orange-400" />
                     </div>
-                    <h2 className="text-3xl font-bold text-white mb-4">Escanear Foto</h2>
-                    <p className="text-gray-400 max-w-xs text-lg">Usa Visión por Computadora para extraer palabras de fotos de libros.</p>
-                </div>
+                    <h2 className="text-2xl font-black text-white mb-2 uppercase tracking-wide">Escáner OCR</h2>
+                    <p className="text-gray-400 max-w-xs">Extracción de texto mediante visión artificial (Beta).</p>
+                </NeonCard>
             </motion.div>
         )}
 
@@ -217,43 +222,55 @@ export default function ImportPage() {
                 exit="exit"
                 className="flex-1 flex max-w-4xl mx-auto w-full"
             >
-                <div className="glass-panel w-full p-10 flex flex-col">
-                    {mode === 'paste' ? (
-                        <div className="flex flex-col h-full gap-6">
-                            <textarea
-                                className="flex-1 w-full bg-black/30 rounded-2xl p-6 text-xl text-white placeholder:text-gray-600 border border-white/5 focus:border-[var(--brand-primary)] focus:outline-none resize-none font-mono leading-relaxed transition-colors"
-                                placeholder={`English = Spanish\nHello = Hola\n...`}
-                                value={textInput}
-                                onChange={(e) => setTextInput(e.target.value)}
-                                autoFocus
-                            />
-                            <div className="flex justify-end">
-                                <Button size="lg" onClick={handleProcess} disabled={!textInput.trim()} className="px-12 py-6 text-lg">
-                                    Procesar <ArrowRight className="ml-3 w-6 h-6" />
-                                </Button>
-                            </div>
-                        </div>
-                    ) : (
-                         <div className="flex flex-col items-center justify-center h-full gap-8">
-                             {loading ? (
-                                <div className="text-center">
-                                    <div className="w-24 h-24 rounded-full border-4 border-white/10 border-t-[var(--brand-primary)] animate-spin mx-auto mb-6" />
-                                    <h3 className="text-2xl font-bold animate-pulse">Analizando... {progress}%</h3>
+                <div className="w-full relative">
+                     {/* Decorative Borders */}
+                     <div className="absolute -inset-1 bg-gradient-to-r from-[var(--brand-primary)]/20 to-[var(--brand-secondary)]/20 rounded-3xl blur opacity-50" />
+                     
+                    <div className="relative bg-[#0a0a0f] border border-white/10 rounded-3xl p-8 h-full flex flex-col shadow-2xl">
+                        {mode === 'paste' ? (
+                            <div className="flex flex-col h-full gap-6">
+                                <textarea
+                                    className="flex-1 w-full bg-black/50 rounded-xl p-6 text-xl text-white placeholder:text-gray-600 border border-white/10 focus:border-[var(--brand-primary)] focus:outline-none resize-none font-mono leading-relaxed transition-colors custom-scrollbar"
+                                    placeholder={`English = Spanish\nHello = Hola\n...`}
+                                    value={textInput}
+                                    onChange={(e) => setTextInput(e.target.value)}
+                                    autoFocus
+                                />
+                                <div className="flex justify-end">
+                                    <Button size="lg" onClick={handleProcess} disabled={!textInput.trim()} className="px-12 py-6 text-lg tracking-widest font-black shadow-[0_0_20px_-5px_var(--brand-primary)]">
+                                        PROCESAR <ArrowRight className="ml-3 w-6 h-6" />
+                                    </Button>
                                 </div>
-                             ) : (
-                                <label className="w-full h-96 border-4 border-dashed border-white/10 rounded-3xl flex flex-col items-center justify-center hover:bg-white/5 hover:border-white/20 transition-all cursor-pointer group">
-                                    <input type="file" className="hidden" accept={mode === 'ocr' ? "image/*" : ".txt"} onChange={handleFileChange} />
-                                    <div className="p-8 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] mb-6 group-hover:scale-110 transition-transform">
-                                        <Upload className="w-16 h-16" />
+                            </div>
+                        ) : (
+                             <div className="flex flex-col items-center justify-center h-full gap-8">
+                                 {loading ? (
+                                    <div className="text-center">
+                                        <div className="relative w-32 h-32 mx-auto mb-6">
+                                            <div className="absolute inset-0 border-4 border-[var(--brand-primary)]/30 rounded-full animate-ping" />
+                                            <div className="absolute inset-0 border-4 border-t-[var(--brand-primary)] border-r-transparent border-b-[var(--brand-primary)] border-l-transparent rounded-full animate-spin" />
+                                            <div className="absolute inset-0 flex items-center justify-center text-[var(--brand-primary)] font-bold">
+                                                {progress}%
+                                            </div>
+                                        </div>
+                                        <h3 className="text-2xl font-bold animate-pulse text-[var(--brand-primary)] uppercase tracking-widest">Analizando Datos...</h3>
                                     </div>
-                                    <h3 className="text-3xl font-bold text-white mb-2">Haz clic para subir</h3>
-                                    <p className="text-xl text-gray-500">
-                                        {mode === 'ocr' ? "JPG, PNG, WEBP" : "Archivos de texto (.txt)"}
-                                    </p>
-                                </label>
-                             )}
-                         </div>
-                    )}
+                                 ) : (
+                                    <label className="w-full h-96 border-2 border-dashed border-white/10 rounded-3xl flex flex-col items-center justify-center hover:bg-white/5 hover:border-[var(--brand-primary)]/50 transition-all cursor-pointer group relative overflow-hidden">
+                                        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5 pointer-events-none" />
+                                        <input type="file" className="hidden" accept={mode === 'ocr' ? "image/*" : ".txt"} onChange={handleFileChange} />
+                                        <div className="p-8 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] mb-6 group-hover:scale-110 transition-transform shadow-[0_0_30px_-5px_var(--brand-primary)]">
+                                            {mode === 'ocr' ? <ScanLine className="w-16 h-16" /> : <Upload className="w-16 h-16" />}
+                                        </div>
+                                        <h3 className="text-3xl font-black text-white mb-2 uppercase">Subir Archivo</h3>
+                                        <p className="text-xl text-gray-500 font-mono">
+                                            {mode === 'ocr' ? "JPG, PNG, WEBP" : "Archivos .TXT"}
+                                        </p>
+                                    </label>
+                                 )}
+                             </div>
+                        )}
+                    </div>
                 </div>
             </motion.div>
         )}
@@ -268,73 +285,72 @@ export default function ImportPage() {
                 className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 h-[70vh]"
             >
                 {/* Word List Area */}
-                <div className="lg:col-span-8 glass-panel overflow-hidden flex flex-col">
-                    <div className="p-6 border-b border-white/5 bg-black/20 flex justify-between items-center">
-                         <h3 className="text-xl font-bold">Palabras Detectadas</h3>
-                         <span className="bg-[var(--brand-primary)]/20 text-[var(--brand-primary)] px-3 py-1 rounded-full text-xs font-bold">
-                             {words.length} items
+                <div className="lg:col-span-8 bg-[#0a0a0f] border border-white/10 rounded-3xl overflow-hidden flex flex-col shadow-xl">
+                    <div className="p-6 border-b border-white/10 bg-black/40 flex justify-between items-center">
+                         <h3 className="text-lg font-bold uppercase tracking-wider text-gray-300">Datos Detectados</h3>
+                         <span className="bg-[var(--brand-primary)]/20 text-[var(--brand-primary)] px-4 py-1 rounded-full text-xs font-bold border border-[var(--brand-primary)]/20">
+                             {words.length} UNIDADES
                          </span>
                     </div>
                     <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
                          <div className="space-y-2">
                              {words.map((w, idx) => (
                                  <div key={idx} className="flex items-center gap-4 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/10 group">
-                                     <div className="text-gray-500 font-mono w-8 text-center">{idx + 1}</div>
+                                     <div className="text-[var(--brand-primary)] font-mono w-8 text-center text-xs">{idx + 1}</div>
                                      <div className="flex-1 grid grid-cols-2 gap-4">
                                          <div className="font-bold text-lg text-white">{w.eng}</div>
-                                         <div className="text-gray-300 text-lg">{w.esp}</div>
+                                         <div className="text-gray-400 text-lg">{w.esp}</div>
                                      </div>
                                      <button 
                                         onClick={() => setWords(words.filter((_, i) => i !== idx))}
-                                        className="p-2 opacity-50 group-hover:opacity-100 text-red-400 hover:bg-red-400/20 rounded-lg transition-all"
+                                        className="p-2 opacity-50 group-hover:opacity-100 text-red-500 hover:bg-red-500/20 rounded-lg transition-all"
                                      >
                                         <X className="w-5 h-5" />
                                      </button>
                                  </div>
                              ))}
                              {words.length === 0 && (
-                                 <div className="p-12 text-center text-gray-500">No hay palabras en la lista.</div>
+                                 <div className="p-12 text-center text-gray-500 font-mono">NO DATA FOUND</div>
                              )}
                          </div>
                     </div>
                 </div>
 
                 {/* Sidebar Save Area */}
-                <div className="lg:col-span-4 glass-panel p-8 flex flex-col gap-6 h-fit sticky top-4">
+                <NeonCard color="primary" className="lg:col-span-4 p-8 flex flex-col gap-6 h-fit sticky top-4">
                      <div>
-                        <label className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3 block">Nombre de la Colección</label>
+                        <label className="text-xs font-bold text-[var(--brand-primary)] uppercase tracking-widest mb-3 block">IDENTIFICADOR DE COLECCIÓN</label>
                         <Input 
                             value={targetTopicName}
                             onChange={(e) => setTargetTopicName(e.target.value)}
-                            placeholder="Ej: Viaje a Londres"
-                            className="bg-black/30 border-white/10 h-14 text-lg focus:border-[var(--brand-primary)]"
+                            placeholder="EJ: TECNOLOGÍA"
+                            className="bg-black/50 border-[var(--brand-primary)]/30 h-14 text-lg focus:border-[var(--brand-primary)] font-bold text-white"
                         />
                      </div>
                      
-                     <div className="p-4 rounded-xl bg-[var(--brand-primary)]/10 border border-[var(--brand-primary)]/20">
-                         <h4 className="font-bold text-[var(--brand-primary)] mb-2 flex items-center gap-2">
-                             <Sparkles className="w-4 h-4" /> Resumen
+                     <div className="p-4 rounded-xl bg-black/40 border border-white/10">
+                         <h4 className="font-bold text-white mb-2 flex items-center gap-2 text-sm uppercase tracking-wider">
+                             <Sparkles className="w-4 h-4 text-yellow-400" /> Resumen de Ingesta
                          </h4>
-                         <p className="text-sm text-gray-300">
-                             Se crearán <strong>{words.length}</strong> tarjetas nuevas. 
-                             Podrás repasarlas inmediatamente en el modo de juego.
+                         <p className="text-xs text-gray-400 leading-relaxed font-mono">
+                             Se generarán <strong>{words.length}</strong> nuevos registros en la base de datos de conocimiento.
                          </p>
                      </div>
 
-                     <div className="mt-auto pt-4">
+                     <div className="mt-auto pt-4 space-y-3">
                         <Button 
-                            className="w-full h-16 text-xl font-bold shadow-2xl shadow-[var(--brand-primary)]/20"
+                            className="w-full h-16 text-xl font-black uppercase tracking-widest shadow-[0_0_20px_-5px_var(--brand-primary)]"
                             onClick={handleSave}
                             disabled={!targetTopicName || words.length === 0}
                             isLoading={loading}
                         >
-                            Guardar Colección
+                            Confirmar
                         </Button>
-                        <Button variant="ghost" className="w-full mt-4" onClick={() => setStep('input')}>
-                            Volver y Añadir Más
+                        <Button variant="ghost" className="w-full text-xs text-gray-500 hover:text-white" onClick={() => setStep('input')}>
+                            DESCARTAR y VOLVER
                         </Button>
                      </div>
-                </div>
+                </NeonCard>
             </motion.div>
         )}
       </AnimatePresence>

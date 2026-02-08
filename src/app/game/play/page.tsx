@@ -121,14 +121,24 @@ export default function PlayPage() {
          </div>
       </div>
 
-      {/* Progress Line */}
-      <div className="absolute top-0 w-full h-1 bg-white/5 z-20">
-        <motion.div 
-            className="h-full bg-[var(--brand-primary)] shadow-[0_0_10px_var(--brand-primary)]"
-            initial={{ width: 0 }}
-            animate={{ width: `${((currentWordIndex) / words.length) * 100}%` }}
-            transition={{ type: "spring", stiffness: 50, damping: 20 }}
-        />
+      {/* Sci-Fi Progress Bar */}
+      <div className="absolute top-0 left-0 w-full h-2 z-50 bg-gray-900/20">
+        <div className="w-full h-full relative overflow-hidden">
+             <div className="absolute inset-0 bg-white/5 backdrop-blur-sm" />
+             <motion.div 
+                className="h-full relative bg-gradient-to-r from-[var(--brand-secondary)] via-[var(--brand-primary)] to-white"
+                initial={{ width: 0 }}
+                animate={{ width: `${((currentWordIndex) / words.length) * 100}%` }}
+                transition={{ type: "spring", stiffness: 30, damping: 15 }}
+             >
+                {/* Glow bloom */}
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-24 h-12 bg-[var(--brand-primary)] blur-xl opacity-80" />
+                <div className="absolute right-0 top-0 h-full w-full shadow-[0_0_20px_var(--brand-primary)]" />
+                
+                {/* Leading Spark */}
+                <div className="absolute -right-1 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-[0_0_15px_white,0_0_30px_var(--brand-primary)] z-10" />
+             </motion.div>
+        </div>
       </div>
 
       <AnimatePresence mode="wait">

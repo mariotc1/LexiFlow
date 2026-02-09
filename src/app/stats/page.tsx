@@ -70,7 +70,7 @@ export default function StatsPage() {
   const totalFallos = palabras.reduce((acc, p) => acc + p.fallos, 0);
   const total = totalAciertos + totalFallos;
   const accuracy = total > 0 ? Math.round((totalAciertos / total) * 100) : 0;
-  const totalTime = Math.round(partidas.reduce((acc, p) => acc + p.tiempoTotal, 0) / 60);
+
 
   // Neon Chart Options
   const commonOptions = {
@@ -168,7 +168,7 @@ export default function StatsPage() {
       </div>
 
       {/* HUD STATS GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <HudStat 
               icon={<Database className="w-6 h-6" />} 
               label="PALABRAS REGISTRADAS" 
@@ -187,12 +187,7 @@ export default function StatsPage() {
               value={`${accuracy}%`} 
               color={accuracy >= 80 ? 'var(--brand-primary)' : '#eab308'}
           />
-          <HudStat 
-              icon={<Clock className="w-6 h-6" />} 
-              label="TIEMPO DE ENTRENAMIENTO" 
-              value={`${totalTime} MIN`} 
-              color="var(--brand-secondary)"
-          />
+
       </div>
 
       {/* CHARTS GRID */}
@@ -221,7 +216,7 @@ export default function StatsPage() {
                     <h3 className="font-bold tracking-widest text-sm uppercase">Distribución de Aciertos</h3>
                 </div>
                 <div className="flex-1 flex items-center justify-center p-4">
-                    <div className="w-full max-w-[250px]">
+                    <div className="w-full max-w-[320px]">
                         <Doughnut 
                             data={doughnutData} 
                             options={{
@@ -230,6 +225,9 @@ export default function StatsPage() {
                                     legend: { position: 'bottom', labels: { color: '#fff', font: { family: 'monospace' } } }
                                 },
                                 cutout: '70%',
+                                layout: {
+                                    padding: 20
+                                }
                             }} 
                         />
                     </div>

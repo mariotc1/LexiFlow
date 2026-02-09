@@ -225,8 +225,9 @@ export default function StatsPage() {
                                     legend: { position: 'bottom', labels: { color: '#fff', font: { family: 'monospace' } } }
                                 },
                                 cutout: '70%',
+                                maintainAspectRatio: true,
                                 layout: {
-                                    padding: 20
+                                    padding: 10
                                 }
                             }} 
                         />
